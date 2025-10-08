@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>En Vivo — Baccarat (Mejor de 3)</title>
+<style>
+  :root{
+    --ink:#eaf2ff; --mut:#9fb0d9; --g1:#71e1ff; --g2:#25c3ff; --gold:#ffd86a;
+    --felt1:#184d57; --felt2:#0f2f35;
+    --cardW: clamp(62px, 9.2vw, 92px);
+    --cardH: calc(var(--cardW) * 1.39);
+    --page-bg: url("https://ricomx.ft-crm.com/media-api/serve/d9ac58ea-8cb5-4568-9bf6-01928a0e087a_BG1.jpg");
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{
+    margin:0; color:var(--ink);
+    background:
+      linear-gradient( rgba(18,8,38,.12), rgba(8,7,20,.55) ),
+      var(--page-bg) center/cover no-repeat fixed;
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+    display:flex; align-items:center; justify-content:center; padding:8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @supports (-webkit-touch-callout:none){ body{ background-attachment: scroll; } }
+
+  .wrap{ width:min(1100px,98vw) }
+  .card{
+    position:relative; border-radius:22px; padding:12px; overflow:visible;
+    background:linear-gradient(180deg,#1b2a56,#0f1832);
+    outline:1px solid rgba(255,255,255,.08); box-shadow:0 16px 60px rgba(0,0,0,.55);
+  }
+
+  .top{ display:flex; gap:10px; align-items:center; justify-content:space-between; margin:2px 2px 8px; flex-wrap:wrap }
+  .status{font-weight:800; background:rgba(0,0,0,.35); padding:6px 10px; border-radius:10px}
+
+  .backBtn{
+    position:fixed; top:calc(10px + env(safe-area-inset-top)); left:calc(10px + env(safe-area-inset-left));
+    z-index:99999;
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 12px; border-radius:12px; text-decoration:none;
+    font-weight:900; letter-spacing:.3px; color:#0c1220; background:#eaf2ff;
+    box-shadow:0 6px 24px rgba(0,0,0,.35), inset 0 -2px 0 rgba(0,0,0,.25);
+    user-select:none;
+  }
+
+  .felt{
+    position:relative; border-radius:22px; padding:14px 14px 140px;
+    background:radial-gradient(closest-side,var(--felt1),var(--felt2));
+    outline:1px solid rgba(255,255,255,.08);
+    box-shadow:inset 0 0 70px rgba(0,0,0,.6), 0 0 60px rgba(113,225,255,.18), 0 0 80px rgba(192,107,255,.16);
+    overflow:hidden; width:100%; aspect-ratio:16/9; max-height:calc(100vh - 140px);
+  }
+
+  #fx{ position:absolute; inset:0; pointer-events:none; z-index:1 }
+
+  .hud{ position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:9; display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center }
+  .pill{background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px 12px; font-weight:900; font-size:clamp(12px,1.8vw,14px)}
+
+  .hand{ position:absolute; top:clamp(18px, 3.5vh, 34px); display:flex; gap:10px; z-index:5; pointer-events:none }
+  .hand.player{ left:clamp(14px, 5vw, 60px) }
+  .hand.banker{ right:clamp(14px, 5vw, 60px) }
+
+  .tot{ position:absolute; top:6px; font:900 clamp(11px,1.8vw,14px)/1 ui-sans-serif; color:var(--gold); text-shadow:0 2px 6px rgba(0,0,0,.6) }
+  .tot.p{ left:clamp(14px, 5vw, 60px) } .tot.b{ right:clamp(14px, 5vw, 60px) }
+
+  .areas{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    display:grid; grid-auto-flow:column; grid-template-columns:repeat(3,1fr);
+    align-items:center; justify-items:center; gap:clamp(10px,3vw,28px);
+    width:min(520px,72%); z-index:20;
+  }
+  .area{ appearance:none; border:0; background:none; padding:0; margin:0; position:relative; cursor:pointer; color:inherit }
+
+  .betSpot{
+    display:grid; place-items:center;
+    width:clamp(82px,12vw,140px); height:clamp(82px,12vw,140px); border-radius:50%;
+    box-shadow:inset 0 0 0 6px rgba(255,255,255,.15);
+    background:radial-gradient(circle, rgba(255,255,255,.08), rgba(255,255,255,0) 65%);
+    outline:2px dashed rgba(255,255,255,.14);
+  }
+  .spotText{ text-align:center; line-height:1.1 }
+  .lab{ display:block; font:900 clamp(13px,2.2vw,18px)/1 ui-sans-serif; letter-spacing:1px }
+  .odds{ display:block; opacity:.85; font-weight:800; font-size:clamp(10px,1.6vw,12px); margin-top:2px }
+  .player .lab{ color:#c6ffea } .banker .lab{ color:#ffc6c6 } .tie .lab{ color:#ffe39a }
+
+  .controls{ position:absolute; left:50%; bottom:10px; transform:translateX(-50%); display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center; z-index:22 }
+  .btn{border:0; border-radius:14px; padding:10px 16px; font-weight:900; cursor:pointer; background:linear-gradient(to right,var(--g1),var(--g2)); color:#061018; box-shadow:0 0 18px rgba(113,225,255,.5), inset 0 -3px 0 rgba(0,0,0,.35)}
+  .winner{ position:absolute; inset:0; display:none; place-items:center; z-index:8; pointer-events:none }
+  .winner.show{ display:grid; animation:fadeOut 2.2s ease forwards }
+  .winBadge{ padding:16px 26px; border-radius:18px; font:900 clamp(20px,4vw,34px)/1 ui-sans-serif; letter-spacing:1px; color:#061018; box-shadow:0 0 24px rgba(113,225,255,.6) }
+  .winBadge.player{ background:linear-gradient(90deg,#aaffef,#71f1d6)}
+  .winBadge.banker{ background:linear-gradient(90deg,#ffc6cf,#ff9aa5)}
+  .winBadge.tie{ background:linear-gradient(90deg,#fff0b5,#ffd86a)}
+
+  /* Modal cupón */
+  .overlay{ position:fixed; inset:0; background:rgba(0,0,12,.86); display:none; place-items:center; z-index:13000; backdrop-filter: blur(4px) }
+  .overlay.show{ display:grid }
+  .modal{ width:min(520px,92vw); border-radius:20px; padding:18px; text-align:center; background:radial-gradient(120% 120% at 50% 0%, #1a1740 0%, #0d1230 60%); outline:1px solid rgba(180,220,255,.25); box-shadow:0 24px 90px rgba(0,0,0,.75); color:#eaf2ff }
+  .voucher{ font-family:ui-monospace,Menlo,monospace; font-size:clamp(16px,3.8vw,20px); letter-spacing:.6px; padding:12px 14px; border-radius:12px; color:#d8b6ff; background:#0a0d1a; display:inline-block; outline:1px dashed rgba(160,220,255,.4); margin:10px 0 6px; }
+  .row{display:flex; gap:10px; justify-content:center; margin-top:10px; flex-wrap:wrap}
+  .copy,.close{cursor:pointer; border:0; border-radius:12px; padding:10px 14px; font-weight:900; font-size:clamp(13px,3.6vw,14px)}
+  .copy{background:#2b2b2b; color:#fff} .close{background:#fff; color:#111}
+</style>
+</head>
+<body>
+
+<a class="backBtn" href="index.html" aria-label="Volver al menú">← Volver</a>
+
+<div class="wrap">
+  <div class="card">
+    <div class="top">
+      <div class="note" style="font-size:12px;opacity:.9"><b>Mejor de 3</b> • Gana 2 para el cupón de victoria</div>
+      <div class="status" id="status">Listo</div>
+    </div>
+
+    <div class="felt" id="felt" aria-live="polite">
+      <canvas id="fx"></canvas>
+
+      <div class="hud"><div class="pill" id="progressTop">Apuestas restantes: 3 • Victorias: 0</div></div>
+
+      <div class="tot p" id="pTot">Jugador: —</div>
+      <div class="tot b" id="bTot">Banca: —</div>
+
+      <div class="hand player" id="pHand"></div>
+      <div class="hand banker" id="bHand"></div>
+
+      <div class="areas" id="areas" role="group" aria-label="Áreas de apuesta">
+        <button type="button" class="area player" id="areaPlayer" data-side="player" aria-label="Apostar a Jugador">
+          <div class="betSpot"><div class="spotText"><span class="lab">JUGADOR</span><span class="odds">1 : 1</span></div></div>
+        </button>
+        <button type="button" class="area tie" id="areaTie" data-side="tie" aria-label="Apostar al Empate">
+          <div class="betSpot"><div class="spotText"><span class="lab">EMPATE</span><span class="odds">8 : 1</span></div></div>
+        </button>
+        <button type="button" class="area banker" id="areaBanker" data-side="banker" aria-label="Apostar a Banca">
+          <div class="betSpot"><div class="spotText"><span class="lab">BANCA</span><span class="odds">0.95 : 1</span></div></div>
+        </button>
+      </div>
+
+      <div class="controls"><button class="btn" id="dealBtn" type="button" disabled>Repartir</button></div>
+      <div class="winner" id="winnerOverlay"><div class="winBadge" id="winBadge">Gana Jugador</div></div>
+    </div>
+
+    <div style="margin:10px 4px 0; display:flex; justify-content:center;">
+      <div class="pill" id="outerBanner">Toca un círculo: Jugador / Empate / Banca</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Cupón -->
+<div class="overlay" id="voucherOverlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div id="voucherHeader" style="font-weight:900; font-size:clamp(16px,4.2vw,22px); margin-bottom:6px">Tu Cupón</div>
+    <div class="voucher" id="voucherText">VIPLW5</div>
+    <div class="row">
+      <button class="copy" id="copyBtn" type="button">Copiar código</button>
+      <button class="close" id="closeBtn" type="button">Cerrar</button>
+    </div>
+    <div style="color:#a9b7d8;margin-top:8px; font-size:12px">Úsalo en tu cuenta. Una jugada por usuario.</div>
+  </div>
+</div>
+
+<!-- BGM / SFX (cámbialos si quieres) -->
+<audio id="bgm" src="theme.mp3" preload="auto" loop playsinline></audio>
+
+<script>
+/* === Solo un camino: si no eligió Live en el menú, redirigimos === */
+(function enforceChoice(){
+  const CHOICE_KEY='mg_path_choice_v1';
+  const choice = localStorage.getItem(CHOICE_KEY)||'';
+  if(choice && choice!=='live'){ location.href='index.html'; }
+})();
+
+function g(id){return document.getElementById(id)}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+
+/* Reglas y cupones */
+const MAX_ROUNDS=3;                   // 3 apuestas
+const CODE_WIN='VIPLW5';              // gana (≥2)
+const CODE_LOSE='VIPLL5';             // pierde (0 o 1)
+const CLAIM_KEY='live_es_claimed_v1'; // guardamos reclamo para evitar repetir
+
+/* BGM warm-up */
+const bgm=g('bgm');
+window.addEventListener('load', async ()=>{ try{ bgm.volume=0.25; bgm.muted=true; await bgm.play(); }catch(e){} }, {once:true});
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev, async function first(){
+  try{ if(bgm.paused){ await bgm.play(); } bgm.muted=false; bgm.volume=0.25; }catch(e){}
+  document.removeEventListener(ev, first, {capture:false});
+},{once:true, passive:true}));
+
+/* DOM refs */
+const status=g('status'), banner=g('outerBanner');
+const pHand=g('pHand'), bHand=g('bHand'), pTot=g('pTot'), bTot=g('bTot');
+const btnP=g('areaPlayer'), btnT=g('areaTie'), btnB=g('areaBanker');
+const dealBtn=g('dealBtn'), progressTop=g('progressTop');
+const winnerOverlay=g('winnerOverlay'), winBadge=g('winBadge');
+const voucherOverlay=g('voucherOverlay'), voucherText=g('voucherText'), voucherHeader=g('voucherHeader'), copyBtn=g('copyBtn'), closeBtn=g('closeBtn');
+
+/* Si ya fue reclamado, mostramos el último código y bloqueamos */
+const claimed=localStorage.getItem(CLAIM_KEY);
+if(claimed){
+  const c=JSON.parse(claimed||'{}');
+  voucherText.textContent=c.code||CODE_LOSE;
+  voucherHeader.textContent = (c.code===CODE_WIN) ? "¡Cupón por victoria!" : "Cupón de consolación";
+  voucherOverlay.classList.add('show');
+  lock(true); // bloquea
+}
+
+/* Estado */
+let roundsPlayed=0, winsCount=0, selection=null, inRound=false;
+
+/* Baraja básica Baccarat */
+const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const SUITS=['♠','♥','♦','♣'];
+function bacVal(r){ if(r==='A')return 1; if(r==='10'||r==='J'||r==='Q'||r==='K') return 0; return +r }
+function total(hand){ return hand.reduce((t,c)=>t+bacVal(c.r),0)%10 }
+function newCard(){ const r=RANKS[(Math.random()*RANKS.length)|0]; const s=SUITS[(Math.random()*4)|0]; return {r,s,shown:false,el:null} }
+function makeCardEl(card, show=false){
+  const el=document.createElement('div'); el.className='playing-card'+(show?' reveal':'');
+  el.innerHTML=`<div class="card3d"><div class="sideFace back">🂠</div><div class="sideFace front">${card.r}${card.s}</div></div>`;
+  card.el=el; card.shown=!!show; return card;
+}
+function flip(card){ if(card.shown) return; card.shown=true; if(card.el) card.el.classList.add('reveal'); }
+
+/* Selección y bloqueos */
+function lock(disabled){
+  [btnP,btnT,btnB].forEach(b=>{ b.disabled=!!disabled; if(disabled) b.classList.remove('sel') });
+  dealBtn.disabled = !!disabled;
+  if(disabled) selection=null;
+}
+function selectSide(side){
+  if(inRound) return;
+  const map={player:btnP, tie:btnT, banker:btnB};
+  const btn=map[side];
+  if(!btn || btn.disabled) return;
+  [btnP,btnT,btnB].forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  selection=side;
+  dealBtn.disabled=false;
+
+  banner.textContent=`Seleccionado: ${side.toUpperCase()} • Toca REPARTIR`;
+  status.textContent=`Seleccionado: ${side}`;
+}
+[btnP,btnT,btnB].forEach((b) => {
+  const side = b.dataset.side;
+  b.addEventListener('click', (e)=>{ e.preventDefault(); if(!b.disabled) selectSide(side); }, {passive:false});
+});
+
+/* Flujo de ronda */
+dealBtn.addEventListener('click', startRound, {passive:true});
+async function startRound(){
+  if(inRound) return;
+  if(!selection) return alert('Elige Jugador / Empate / Banca primero.');
+  if(roundsPlayed>=MAX_ROUNDS) return;
+  inRound=true; dealBtn.disabled=true;
+
+  // Preparar manos
+  pHand.innerHTML=''; bHand.innerHTML='';
+  let P = [ makeCardEl(newCard(), false), makeCardEl(newCard(), false) ];
+  let B = [ makeCardEl(newCard(), false), makeCardEl(newCard(), false) ];
+  P.forEach(c=> pHand.appendChild(c.el));
+  B.forEach(c=> bHand.appendChild(c.el));
+
+  await delay(250); flip(P[0]); updateTotals(P,B);
+  await delay(520); flip(B[0]); updateTotals(P,B);
+  await delay(520); flip(P[1]); updateTotals(P,B);
+  await delay(520); flip(B[1]); updateTotals(P,B);
+
+  // Naturales 8/9
+  if(total(P)>=8 || total(B)>=8){ await finishRound(P,B); return; }
+
+  // Tercera carta del Jugador
+  let playerThird=null;
+  if(total(P)<=5){
+    playerThird = makeCardEl(newCard(), false);
+    pHand.appendChild(playerThird.el);
+    await delay(420);
+    flip(playerThird); P.push(playerThird); updateTotals(P,B);
+  }
+
+  // Reglas tercera carta de Banca
+  const bT0=total(B);
+  let needBanker=false;
+  if(!playerThird){ needBanker=bT0<=5; }
+  else{
+    const v = bacVal(playerThird.r);
+    needBanker = (bT0<=2) || (bT0===3 && v!==8) || (bT0===4 && v>=2 && v<=7) || (bT0===5 && v>=4 && v<=7) || (bT0===6 && (v===6||v===7));
+  }
+  if(needBanker){
+    const b3 = makeCardEl(newCard(), false);
+    bHand.appendChild(b3.el);
+    await delay(420);
+    flip(b3); B.push(b3); updateTotals(P,B);
+  }
+
+  await finishRound(P,B);
+}
+
+function updateTotals(P=[],B=[]){
+  const p = P.some(c=>c.shown) ? total(P) : '—';
+  const b = B.some(c=>c.shown) ? total(B) : '—';
+  pTot.textContent = 'Jugador: ' + p;
+  bTot.textContent = 'Banca: ' + b;
+}
+
+async function finishRound(P,B){
+  const pT=total(P), bT=total(B);
+  let who = (pT>bT)?'player' : (bT>pT)?'banker':'tie';
+  let text = (who==='player') ? 'Gana Jugador' : (who==='banker') ? 'Gana Banca' : 'Empate';
+  showWinner(who, text);
+
+  if(who!=='tie' && selection===who) winsCount++;
+
+  roundsPlayed++;
+  const left = Math.max(0, MAX_ROUNDS - roundsPlayed);
+  progressTop.textContent = `Apuestas restantes: ${left} • Victorias: ${winsCount}`;
+
+  if(roundsPlayed>=MAX_ROUNDS){
+    await delay(700);
+    // Mejor de 3: gana si >=2
+    const code = (winsCount>=2) ? CODE_WIN : CODE_LOSE;
+    finalizeVoucher(code);
+  }else{
+    // Pausa y siguiente
+    banner.textContent = `Resultado: ${text} • Abriendo siguiente apuesta…`;
+    status.textContent = 'Espera…';
+    lock(true);
+    setTimeout(()=>{
+      pHand.innerHTML=''; bHand.innerHTML='';
+      winnerOverlay.classList.remove('show');
+      inRound=false;
+      lock(false);
+      dealBtn.disabled=true;
+      banner.textContent = `Apuesta: Jugador / Empate / Banca (${left} restantes)`;
+      status.textContent = 'Haz tu apuesta';
+    }, 2200);
+  }
+}
+
+function showWinner(winner, text){
+  winBadge.textContent=text;
+  winBadge.className='winBadge '+(winner==='player'?'player':winner==='banker'?'banker':'tie');
+  winnerOverlay.classList.remove('show'); void winnerOverlay.offsetWidth;
+  winnerOverlay.classList.add('show');
+}
+
+function finalizeVoucher(code){
+  voucherText.textContent = code;
+  voucherHeader.textContent = (code===CODE_WIN) ? "¡Cupón por victoria!" : "Cupón de consolación";
+  voucherOverlay.classList.add('show');
+  try{ localStorage.setItem(CLAIM_KEY, JSON.stringify({code, ts:Date.now()})); }catch(e){}
+  lock(true);
+}
+
+copyBtn.onclick=()=>{ const t=voucherText.textContent.trim(); if(!t) return; navigator.clipboard.writeText(t).then(()=>{ copyBtn.textContent='¡Copiado!'; setTimeout(()=>copyBtn.textContent='Copiar código',1200); }); };
+closeBtn.onclick=()=> voucherOverlay.classList.remove('show');
+
+/* Init */
+function init(){ g('outerBanner').textContent='Toca un círculo: Jugador / Empate / Banca'; lock(false); }
+init();
+
+/* FX canvas (decorativo) */
+const fx=g('fx'), ctx=fx.getContext('2d');
+function resizeFX(){ fx.width=fx.parentElement.clientWidth; fx.height=fx.parentElement.clientHeight }
+addEventListener('resize',resizeFX); addEventListener('orientationchange',()=>setTimeout(resizeFX,200)); resizeFX();
+</script>
+</body>
+</html>
