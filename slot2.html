@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Slots Neón — 5 Tiros</title>
+<style>
+  :root{
+    --bgDark:#0a0718; --bgDeep:#090a16; --ink:#eef4ff; --muted:#a9b7d8;
+    --tubeA:#8a5dff; --tubeB:#ff4de1; --tubeC:#56d0ff;
+    --panel1:#171a3f; --panel2:#0c1230;
+    --bezel1:#ffe39a; --bezel2:#ffc54d; --bezel3:#d48a07; --bezel4:#7a4e05;
+    --accent:#c06bff; --green:#8EFF98;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{
+    margin:0; color:var(--ink);
+    background:
+      linear-gradient(rgba(18,8,38,.10), rgba(8,7,20,.50)),
+      url("https://ricomx.ft-crm.com/media-api/serve/d9ac58ea-8cb5-4568-9bf6-01928a0e087a_BG1.jpg") center/cover no-repeat fixed;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    display:flex; align-items:center; justify-content:center;
+    padding:clamp(10px,4vw,18px);
+  }
+  @supports (-webkit-touch-callout:none){ body{ background-attachment:scroll } }
+
+  .backBtn{
+    position:fixed; top:calc(10px + env(safe-area-inset-top)); left:calc(10px + env(safe-area-inset-left));
+    z-index:99999; display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; text-decoration:none;
+    font-weight:900; letter-spacing:.3px; color:#0c1220; background:#eaf2ff; box-shadow:0 6px 24px rgba(0,0,0,.35), inset 0 -2px 0 rgba(0,0,0,.25);
+  }
+
+  .cabWrap{ position: relative; width: min(640px,96vw) }
+  .cab{ position:relative; overflow:hidden; width:100%;
+    border-radius:clamp(18px,3vw,30px);
+    padding:clamp(14px,2.8vw,24px) clamp(12px,2.5vw,22px) clamp(10px,2.2vw,18px);
+    background:linear-gradient(180deg,#151733,#0c0f25);
+    box-shadow:0 40px 90px rgba(0,0,0,.65), inset 0 2px 0 rgba(255,255,255,.07), 0 0 60px rgba(113,225,255,.18), 0 0 80px rgba(192,107,255,.16)
+  }
+  .tubes,.tubes:before,.tubes:after{content:""; position:absolute; inset:10px; border-radius:28px; pointer-events:none}
+  .tubes{border:10px solid transparent}
+  .tubes:before{inset:-10px; border:10px solid var(--tubeA); filter:blur(10px); opacity:.9; animation:tubeCycle 6s linear infinite}
+  .tubes:after {inset:-22px; border:14px solid var(--tubeB); filter:blur(18px); opacity:.45; animation:tubeCycle 6s linear reverse infinite}
+  @keyframes tubeCycle{0%{border-color:var(--tubeA)}33%{border-color:var(--tubeB)}66%{border-color:var(--tubeC)}100%{border-color:var(--tubeA)}}
+
+  .brand{text-align:center;margin:6px 0 8px;text-transform:uppercase;font-weight:900;letter-spacing:.5px;color:#ffd9ff;
+         text-shadow:0 0 12px #ff52e4,0 0 28px #7e61ff,0 0 60px #56d0ff}
+  .brand .mega{font-size:clamp(16px,3.6vw,20px);display:block}
+  .brand .title{font-size:clamp(28px,6.7vw,40px);display:block}
+
+  .bezel{position:relative;border-radius:24px;padding:clamp(10px,2.4vw,14px);
+         background:linear-gradient(180deg,var(--bezel1),var(--bezel2) 30%,var(--bezel3) 75%,var(--bezel4) 100%);
+         outline:1px solid rgba(255,255,255,.15)}
+  .window{position:relative;border-radius:18px;background:linear-gradient(180deg,var(--panel1),var(--panel2));
+          outline:1px solid rgba(255,255,255,.15); padding:clamp(12px,2.6vw,16px) clamp(12px,2.8vw,18px);
+          box-shadow: inset 0 0 30px rgba(0,0,0,.65), inset 0 22px 60px rgba(0,0,0,.55)}
+  .reels{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(8px,2.2vw,14px); height:clamp(140px,30vw,200px); perspective:1200px}
+  .reel{position:relative; border-radius:12px; overflow:hidden; background:#0b1230; outline:1px solid rgba(255,255,255,.12)}
+  .col{position:absolute; inset:-40px 0 -40px 0; display:flex; flex-direction:column; align-items:center; gap:18px; padding:14px 12px; transform-style:preserve-3d}
+  .sym{width:100%; height:clamp(54px,11vw,72px); display:grid; place-items:center; font-size:clamp(28px,6vw,40px); font-weight:900; color:#fff;
+       text-shadow:0 4px 14px rgba(0,0,0,.6); background:linear-gradient(180deg,#24307a,#191f56); border-radius:12px; outline:1px solid rgba(255,255,255,.12)}
+
+  .panel{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; flex-wrap:wrap}
+  .badge{padding:8px 12px; border-radius:12px; font-weight:800; background:linear-gradient(180deg,#141c3b,#0f1732); outline:1px solid rgba(255,255,255,.1)}
+  .meters{display:flex; gap:12px; align-items:center}
+  .ring{--p:0; width:clamp(38px,8vw,46px); height:clamp(38px,8vw,46px); border-radius:50%; background:conic-gradient(var(--accent) calc(var(--p)*1%), #222 0); display:grid; place-items:center; font-size:12px; font-weight:900; box-shadow:0 0 18px rgba(192,107,255,.35)}
+  .ring span{background:#0a0d1a; color:#fff; width:clamp(26px,6vw,32px); height:clamp(26px,6vw,32px); display:grid; place-items:center; border-radius:50%}
+  .jack{height:8px; width:clamp(120px,34vw,160px); border-radius:999px; background:#2a2a2a; position:relative; overflow:hidden; box-shadow:0 0 18px rgba(255,96,216,.25)}
+  .jack:before{content:""; position:absolute; inset:0; background:linear-gradient(90deg,#ff62ff,#65f0ff); transform-origin:left; transform:scaleX(var(--fill,0)); transition:transform .25s ease}
+
+  .controls{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px }
+  .btn.primary{cursor:pointer; border:0; border-radius:16px; padding:clamp(12px,2.8vw,14px) clamp(16px,4.6vw,18px);
+               font-weight:900; text-transform:uppercase; letter-spacing:.5px;
+               background:radial-gradient(60% 100% at 50% 0%, #ff66c7, #6d2df7 70%); color:#fff;
+               box-shadow:0 0 22px #b86cff, inset 0 -4px 0 rgba(0,0,0,.45)}
+
+  .payout{min-height:18px; font-size:clamp(12px,2.8vw,14px); color:var(--muted); margin-top:6px}
+  .winflash{position:absolute; inset:0; border-radius:30px; pointer-events:none; opacity:0; transition:opacity .25s ease;
+            background:radial-gradient(600px 260px at 50% -10%, rgba(255,255,255,.18), transparent 60%), radial-gradient(600px 260px at 50% 110%, rgba(255,235,140,.25), transparent 60%)}
+  .cab.win .winflash{opacity:1}
+
+  /* Overlay del cupón */
+  .overlay{ position:fixed; inset:0; background:rgba(0,0,12,.86); display:none; z-index:9999; padding:16px; backdrop-filter: blur(4px); align-items:center; justify-content:center; overflow:auto }
+  .overlay.show{display:flex}
+  .gifModal{ width:min(560px,92vw); border-radius:22px; background:radial-gradient(120% 120% at 50% 0%, #1a1740 0%, #0d1230 60%); outline:1px solid rgba(180,220,255,.25); box-shadow:0 24px 90px rgba(0,0,0,.75); transform:scale(.96); animation:popIn .28s ease forwards; display:flex; flex-direction:column; overflow:auto }
+  @keyframes popIn{to{transform:scale(1)}}
+  .modalBody{display:flex; flex-direction:column; gap:12px; padding:18px}
+  .voucher{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:clamp(14px,3.6vw,18px);
+    letter-spacing:.6px; padding:12px 14px; border-radius:12px; color:#d8b6ff; background:#0a0d1a; display:inline-block;
+    outline:1px dashed rgba(160,220,255,.4);
+  }
+  .row{display:flex; gap:10px; justify-content:center; margin-top:4px; flex-wrap:wrap}
+  .copy,.close{ cursor:pointer; border:0; border-radius:12px; padding:10px 14px; font-weight:900; font-size:clamp(13px,3.6vw,14px) }
+  .copy{background:#2b2b2b; color:#fff} .close{background:#fff; color:#111}
+</style>
+</head>
+<body>
+
+<a class="backBtn" id="backBtn" href="index.html" aria-label="Volver al menú">
+  ← Volver
+</a>
+
+<div class="cabWrap">
+  <div class="cab" id="cab">
+    <canvas id="fx"></canvas>
+    <div class="tubes"></div>
+
+    <div class="brand"><span class="mega">RicoBet</span><span class="title">SLOTS</span></div>
+
+    <div class="bezel">
+      <div class="window">
+        <div class="reels" id="reels"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="badge">Tiros restantes: <span class="v" id="spinsLeft">5</span></div>
+      <div class="meters">
+        <div class="ring" id="ring"><span id="ringNum">0</span></div>
+        <div class="jack" id="jack"></div>
+      </div>
+      <div class="badge">Al finalizar, se mostrará tu cupón</div>
+    </div>
+
+    <div class="controls">
+      <button class="btn primary" id="spin">Girar</button>
+      <div class="lever" id="lever" role="button" aria-label="Palanca para girar" tabindex="0">
+        <div class="stem"></div><div class="knob"></div>
+      </div>
+    </div>
+    <div class="payout" id="payout"></div>
+
+    <div class="winflash"></div>
+  </div>
+</div>
+
+<!-- Cupón -->
+<div class="overlay" id="giftOverlay" role="dialog" aria-modal="true">
+  <div class="gifModal" role="document">
+    <div class="modalBody" style="text-align:center">
+      <div style="font-weight:900; font-size:clamp(18px,4.5vw,24px);">¡Tu cupón de Slots!</div>
+      <div class="voucher" id="voucherText">VOUCHER-XXXX</div>
+      <div class="row">
+        <button class="copy" id="copyBtn">Copiar código</button>
+        <button class="close" id="closeBtn">Cerrar</button>
+      </div>
+      <div class="small" style="color:#a9b7d8;margin-top:6px;">Usa este código en tu cuenta. Un juego por usuario.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SFX (puedes reemplazar por tus propios archivos) -->
+<audio id="sSpin"  src="https://cdn.jsdelivr.net/gh/naptha/tinyfiles@main/slot/lever.mp3" preload="auto"></audio>
+<audio id="sStop"  src="https://cdn.jsdelivr.net/gh/naptha/tinyfiles@main/slot/stop.mp3"  preload="auto"></audio>
+<audio id="sWin"   src="https://cdn.jsdelivr.net/gh/naptha/tinyfiles@main/slot/win.mp3"   preload="auto"></audio>
+
+<!-- BGM (pon tu propio theme.mp3 si quieres) -->
+<audio id="bgm" src="theme.mp3" preload="auto" loop playsinline></audio>
+
+<script>
+/* === Solo un camino: si el usuario no eligió Slots en el menú, redirigimos === */
+(function enforceChoice(){
+  const CHOICE_KEY='mg_path_choice_v1';
+  const choice = localStorage.getItem(CHOICE_KEY)||'';
+  if(choice && choice!=='slots'){ location.href='index.html'; }
+})();
+
+/* === Slots con cupones aleatorios (VIPS05 / VIPS25) === */
+const MAX_SPINS=5;
+const SYMBOLS=["🍒","🍊","🍋","💎","⭐","7️⃣","BAR"];
+const CODES   =["VIPS05","VIPS25"]; // aleatorio
+const STATE_KEY='slot_es_state_v1';
+const VOUCHER_KEY='slot_es_voucher_v1';
+
+let state=loadState();
+let spinning=false, started=false, turbo=false;
+
+const reelsEl=document.getElementById('reels');
+const spinBtn=document.getElementById('spin');
+const lever=document.getElementById('lever');
+const cab=document.getElementById('cab');
+const payoutEl=document.getElementById('payout');
+const spinsLeftEl=document.getElementById('spinsLeft');
+const ring=document.getElementById('ring'); const ringNum=document.getElementById('ringNum');
+const jack=document.getElementById('jack');
+
+const giftOverlay = document.getElementById('giftOverlay');
+const voucherText = document.getElementById('voucherText');
+const copyBtn     = document.getElementById('copyBtn');
+const closeBtn    = document.getElementById('closeBtn');
+
+/* BGM “en silencio” hasta interacción */
+const bgm=document.getElementById('bgm');
+window.addEventListener('load', async ()=>{ try{ bgm.volume=0.25; bgm.muted=true; await bgm.play(); }catch(e){} }, {once:true});
+['pointerdown','keydown'].forEach(ev=>window.addEventListener(ev, async function first(){
+  try{ if(bgm.paused){ await bgm.play(); } bgm.muted=false; bgm.volume=0.25; }catch(e){}
+  window.removeEventListener(ev, first, {capture:false});
+},{once:true, passive:true}));
+
+/* Inicial UI */
+spinsLeftEl.textContent=state.left; updateMeters();
+if(state.claimed){ openGift(localStorage.getItem(VOUCHER_KEY)||'RECLAMADO'); disableControls(); }
+
+/* Construye los rodillos */
+function makeReel(){
+  const reel=document.createElement('div'); reel.className='reel';
+  const col=document.createElement('div'); col.className='col';
+  const pool=[]; for(let i=0;i<20;i++){ pool.push(SYMBOLS[(Math.random()*SYMBOLS.length)|0]) }
+  pool.forEach(s=>{ const it=document.createElement('div'); it.className='sym'; it.textContent=s; col.appendChild(it) });
+  reel.appendChild(col); return reel;
+}
+for(let i=0;i<3;i++){ reelsEl.appendChild(makeReel()); }
+
+/* Girar */
+function spin(){
+  if(spinning || state.claimed) return;
+  if(!started){ started=true; }
+  if(state.left<=0){ revealVoucher(); return; }
+
+  spinning=true; payoutEl.textContent=''; lever.classList.add('pull');
+  document.getElementById('sSpin').play().catch(()=>{});
+
+  const cols=[...document.querySelectorAll('.reel .col')];
+  const targets = cols.map(() => SYMBOLS[(Math.random()*SYMBOLS.length)|0]);
+  const results=[];
+  cols.forEach((col,idx)=>{
+    const dur=(turbo? 600: 1450)+idx*220;
+    const t0=performance.now();
+    (function anim(){
+      const t=performance.now()-t0, p=Math.min(1,t/dur), e=1-Math.pow(1-p,3);
+      const offset=-(e*16*18);
+      col.style.transform=`translateY(${offset}px) rotateX(${e*18}deg)`;
+      if(t<dur){ requestAnimationFrame(anim); }
+      else{
+        const last=col.lastElementChild; if(last){ last.textContent=targets[idx]; }
+        col.style.transform='translateY(0)';
+        results[idx]=targets[idx];
+        if(results.filter(Boolean).length===cols.length){
+          document.getElementById('sStop').play().catch(()=>{});
+          onStop(results);
+          lever.classList.remove('pull');
+        }
+      }
+    })();
+  });
+}
+function onStop(arr){
+  state.spun=(state.spun||0)+1;
+
+  // ¿hay 3 iguales?
+  const freq={}; arr.forEach(s=>freq[s]=(freq[s]||0)+1);
+  let best=0; for(const k in freq){ if(freq[k]>best) best=freq[k]; }
+  if(best>=3){ state.wins=(state.wins||0)+1; payoutEl.innerHTML='<span style="color:var(--green);font-weight:900">¡PREMIO!</span>'; document.getElementById('sWin').play().catch(()=>{}); flash(); }
+  else { payoutEl.textContent='Vuelve a girar'; }
+
+  state.left=Math.max(0,state.left-1); saveState(state);
+  spinsLeftEl.textContent=state.left; updateMeters();
+
+  if(state.left===0){ revealVoucher(); }
+  spinning=false;
+}
+
+function updateMeters(){
+  const used=MAX_SPINS-state.left;
+  ring.style.setProperty('--p', Math.round((used/MAX_SPINS)*100));
+  ringNum.textContent=used;
+  jack.style.setProperty('--fill', Math.min(1,(state.wins||0)/3));
+}
+
+function revealVoucher(){
+  if(state.claimed) return;
+  const code=CODES[(Math.random()*CODES.length)|0]; // aleatorio entre VIPS05 / VIPS25
+  localStorage.setItem(VOUCHER_KEY, code);
+  state.claimed=true; saveState(state);
+  openGift(code); disableControls();
+}
+
+function openGift(code){
+  voucherText.textContent = code;
+  giftOverlay.classList.add('show');
+}
+copyBtn.addEventListener('click',()=> copyText(voucherText.textContent.trim()));
+closeBtn.addEventListener('click',()=> giftOverlay.classList.remove('show'));
+
+function disableControls(){ spinBtn.disabled=true; lever.style.pointerEvents='none' }
+spinBtn.addEventListener('click',spin);
+lever.addEventListener('click',spin);
+lever.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); spin(); }});
+spinBtn.addEventListener('mousedown',()=>{ turbo=true; lever.classList.add('pull') });
+spinBtn.addEventListener('mouseup',()=>{ turbo=false; lever.classList.remove('pull') });
+spinBtn.addEventListener('mouseleave',()=>{ turbo=false; lever.classList.remove('pull') });
+
+/* Copiar helper */
+async function copyText(txt){
+  if(!txt) return;
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(txt);
+      copiedUI(); return;
+    }
+  }catch(_){}
+  const ta=document.createElement('textarea');
+  ta.value=txt; ta.setAttribute('readonly','');
+  ta.style.position='fixed'; ta.style.top='-9999px'; ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.select(); ta.setSelectionRange(0, ta.value.length);
+  try{ document.execCommand('copy'); }catch(_){}
+  document.body.removeChild(ta);
+  copiedUI();
+}
+function copiedUI(){ copyBtn.textContent='¡Copiado!'; setTimeout(()=>copyBtn.textContent='Copiar código',1200); }
+
+function loadState(){ try{ return JSON.parse(localStorage.getItem(STATE_KEY))||{left:MAX_SPINS,claimed:false,spun:0,wins:0} }catch{ return {left:MAX_SPINS,claimed:false,spun:0,wins:0} } }
+function saveState(s){ localStorage.setItem(STATE_KEY, JSON.stringify(s)) }
+
+/* FX */
+const fx=document.getElementById('fx'); const ctx=fx.getContext('2d');
+function resize(){ fx.width=cab.clientWidth; fx.height=cab.clientHeight } addEventListener('resize',resize); addEventListener('orientationchange',()=>setTimeout(resize,250)); resize();
+function flash(){ cab.classList.add('win'); setTimeout(()=>cab.classList.remove('win'),700); }
+</script>
+</body>
+</html>
