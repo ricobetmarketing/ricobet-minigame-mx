@@ -3,23 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Elige tus Recompensas</title>
-
-<link rel="prefetch" href="slot2.html">
-<link rel="prefetch" href="live.html">
-<link rel="preload" as="image" href="https://ricomx.ft-crm.com/media-api/serve/5b55a687-d742-4c8d-bf41-1ba837f4e84f_1.png">
-<link rel="preload" as="image" href="https://ricomx.ft-crm.com/media-api/serve/df6b594c-e8bd-402d-b186-efca9501a635_2.png">
-
+<title>Elige tu Juego</title>
 <style>
   :root{
-    --ink:#eaf2ff; --muted:#a9b7d8;
+    --ink:#eaf2ff; --muted:#9fb0d9;
     --g1:#71e1ff; --g2:#25c3ff; --g3:#c06bff; --g4:#ffd86a;
-    --pad: clamp(12px, 3.5vw, 28px);
-    --island: clamp(170px, 38vw, 220px);
-    --title-offset: clamp(16px, 8vh, 120px);
   }
-  *{ box-sizing:border-box }
-  html,body{ height:100% }
+  *{box-sizing:border-box}
+  html,body{height:100%}
   body{
     margin:0; min-height:100dvh; color:var(--ink);
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
@@ -27,206 +18,70 @@
     background:
       radial-gradient(1200px 800px at 70% -10%, rgba(16,22,44,.10) 0%, rgba(7,11,24,.20) 60%, #070b18 100%),
       url("https://ricomx.ft-crm.com/media-api/serve/4c140695-50a6-4299-ba89-74e46ae291a9_d2fca62c3853293ec42d7121691049c2.jpg") center/cover no-repeat;
-    overflow:hidden;
+    padding: clamp(16px,4vw,28px);
   }
-  .wrap{
-    position:relative; height:100dvh; width:100%; max-width:1100px;
-    padding: calc(var(--pad) + env(safe-area-inset-top)) var(--pad) calc(var(--pad) + env(safe-area-inset-bottom));
-    display:grid; grid-template-rows:auto 1fr; gap: clamp(8px, 2.2vw, 18px);
-    margin:0 auto;
+  .card{
+    width:min(980px,96vw); border-radius:20px; padding:24px;
+    background:linear-gradient(180deg,#1b2a56,#0f1832);
+    outline:1px solid rgba(255,255,255,.08); box-shadow:0 16px 60px rgba(0,0,0,.55);
   }
+  h1{margin:0 0 8px; font-size:clamp(26px,5.6vw,44px); line-height:1.05;
+     background:linear-gradient(90deg,var(--g1),var(--g2),var(--g3),var(--g4)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+  p{margin:0 0 18px; color:var(--muted); font-weight:700}
 
-  header{ text-align:center; z-index:2; pointer-events:none; margin-top: var(--title-offset) }
-  .title{ margin:0; line-height:1.05; letter-spacing:.6px; text-transform:uppercase; }
-  .title .small{
-    display:block; font-weight:800; font-size:clamp(16px,3.8vw,22px); color:var(--ink); opacity:.95;
-    text-shadow:0 0 10px rgba(37,195,255,.25); transform: translateY(8px); animation: smallUp .7s cubic-bezier(.2,.8,.2,1) .1s both;
+  .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px}
+  .tile{
+    position:relative; display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between;
+    padding:18px; border-radius:16px; text-decoration:none; color:inherit;
+    background:linear-gradient(180deg,#152047,#0e1733); outline:1px solid rgba(255,255,255,.08);
+    transition:transform .18s ease, box-shadow .18s ease;
   }
-  @keyframes smallUp{ to{ transform:none; } }
-  .title .big{
-    display:block; font-weight:900; font-size:clamp(40px,10.5vw,84px);
-    background:linear-gradient(90deg, var(--g1), var(--g2), var(--g3), var(--g4), var(--g1));
-    background-size:300% 100%; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
-    text-shadow: 0 0 10px rgba(113,225,255,.25), 0 0 22px rgba(192,107,255,.20), 0 0 44px rgba(255,216,106,.12);
-    transform: scale(.96);
-    animation: hueSlide 5.2s ease-in-out infinite, popInTitle .6s cubic-bezier(.2,.8,.2,1) both;
-  }
-  @keyframes popInTitle{ to{ transform: scale(1); } }
-  @keyframes hueSlide{ 0%{ background-position:0% 50% } 50%{ background-position:100% 50% } 100%{ background-position:0% 50% } }
-
-  .sub{
-    margin:6px 0 0; color:var(--muted); font-weight:800; letter-spacing:.35px;
-    font-size:clamp(12px,2.8vw,14px);
-  }
-
-  .stage{
-    position:relative; height:100%;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding: 3.5vh 0; gap: clamp(20px, 5.5vh, 44px);
-  }
-
-  .island{
-    --btnOffset: 10px;
-    width:var(--island); aspect-ratio:1/1;
-    border-radius:24px; position:relative; text-decoration:none; color:inherit;
-    animation: bob 6s ease-in-out infinite; transition: transform .18s ease;
-  }
-  .island:hover{ transform: translateY(-4px) scale(1.02); }
-  @keyframes bob{ 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-6px) } }
-
-  .icon{ position:relative; width:100%; height:100%; object-fit:contain; display:block;
-    filter: drop-shadow(0 14px 22px rgba(0,0,0,.45)) drop-shadow(0 0 18px rgba(120,243,255,.18));
-    transform-origin: 50% 85%; animation: sway 3.8s ease-in-out infinite; }
-  @keyframes sway{ 0%{transform:rotate(-6deg)} 50%{transform:rotate(6deg)} 100%{transform:rotate(-6deg)} }
-
-  .ribbon{
-    position:absolute; top:8px; left:10px; z-index:3;
-    font-weight:900; font-size:11px; letter-spacing:.6px;
-    padding:6px 10px; border-radius:999px;
-    background:rgba(6,9,18,.78); color:#ffd86a; border:1px solid rgba(255,255,255,.18);
-    box-shadow:0 4px 12px rgba(0,0,0,.35); pointer-events:none;
-  }
-  .ribbon.live{ color:#ffb7c2 } .ribbon.hot{ color:#ffe39a }
-
-  .cta{
-    position:absolute; right:var(--btnOffset); bottom:var(--btnOffset);
-    border:0; border-radius:999px; padding:8px 16px;
-    background:linear-gradient(to right,var(--g1),var(--g2));
-    color:#061018; font-weight:900; letter-spacing:.4px; font-size:13px;
-    box-shadow:0 6px 18px rgba(0,0,0,.35);
-    display:inline-flex; align-items:center; justify-content:center;
-  }
-
-  .hint{
-    position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%);
-    padding:8px 10px; font-size:12px; font-weight:800; color:#0c1220;
-    background:#eaf2ff; border-radius:10px; white-space:nowrap;
-    box-shadow:0 10px 30px rgba(0,0,0,.45);
-  }
-
-  /* Bloqueo de camino elegido */
-  .locked{ filter:grayscale(.9) contrast(.8) opacity(.55); pointer-events:none }
-  .locked .cta{ background:#7b8699; color:#1a2433 }
-  .locked .hint{ background:#c9d3ea }
-
-  /* SPA */
-  .viewWrap{ position:fixed; inset:0; background:#000; display:none; z-index:50 }
-  .viewWrap.show{ display:block; }
-  .viewWrap iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; background:#000; }
-  .backBtn{
-    position:fixed; top:calc(10px + env(safe-area-inset-top)); left:calc(10px + env(safe-area-inset-left));
-    z-index:60; display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; text-decoration:none;
-    font-weight:900; letter-spacing:.3px; color:#0c1220; background:#eaf2ff; box-shadow:0 6px 24px rgba(0,0,0,.35), inset 0 -2px 0 rgba(0,0,0,.25);
-  }
-  .backBtn:active{ transform:translateY(1px) }
+  .tile:hover{ transform:translateY(-2px); box-shadow:0 12px 34px rgba(0,0,0,.45) }
+  .tile h2{margin:0 0 6px; font-size:clamp(18px,3.6vw,26px)}
+  .tile .sub{ color:var(--muted); font-weight:800; font-size:clamp(12px,2.6vw,14px) }
+  .cta{ margin-top:14px; display:inline-block; font-weight:900; letter-spacing:.4px; font-size:14px; padding:10px 14px; border-radius:999px; color:#061018; background:linear-gradient(90deg,var(--g1),var(--g2)); box-shadow:0 8px 18px rgba(0,0,0,.35) }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1 class="title">
-        <span class="small">Elige tus</span>
-        <span class="big">RECOMPENSAS</span>
-      </h1>
-      <div class="sub">Elige un solo camino para jugar y desbloquear tu cupón.</div>
-    </header>
+  <div class="card">
+    <h1>Elige tu Juego</h1>
+    <p>Selecciona <b>Slots</b> o <b>Casino (Baccarat)</b>. Antes de empezar, puedes volver aquí y cambiar.</p>
 
-    <div class="stage">
-      <a class="island" id="btnSlots" href="#" data-url="slot2.html" aria-label="Entrar a Slots">
-        <span class="ribbon hot">HOT</span>
-        <span class="hint">Juega y gana un cupón</span>
-        <img class="icon" src="https://ricomx.ft-crm.com/media-api/serve/5b55a687-d742-4c8d-bf41-1ba837f4e84f_1.png" alt="">
-        <span class="cta">ENTRAR</span>
+    <div class="grid">
+      <a class="tile" id="toSlot" href="slot2.html">
+        <div>
+          <h2>Slots</h2>
+          <div class="sub">Descubre un cupón aleatorio</div>
+        </div>
+        <span class="cta">Entrar a Slots</span>
       </a>
 
-      <a class="island" id="btnLive" href="#" data-url="live.html" aria-label="Entrar a Live">
-        <span class="ribbon live">LIVE</span>
-        <span class="hint">Gana 2 de 3 para el cupón</span>
-        <img class="icon" src="https://ricomx.ft-crm.com/media-api/serve/df6b594c-e8bd-402d-b186-efca9501a635_2.png" alt="">
-        <span class="cta">ENTRAR</span>
+      <a class="tile" id="toLive" href="live.html">
+        <div>
+          <h2>Casino — Baccarat</h2>
+          <div class="sub">Mejor de 3 • Gana si consigues 2</div>
+        </div>
+        <span class="cta">Entrar al Casino</span>
       </a>
     </div>
   </div>
 
-  <!-- Música de fondo (pon tu propio archivo si quieres) -->
+  <!-- Música de fondo (se detiene al salir para no superponer) -->
   <audio id="bgm" src="theme.mp3" preload="auto" loop playsinline></audio>
 
-  <!-- Contenedor SPA para mantener música entre vistas -->
-  <div id="viewWrap" class="viewWrap" aria-live="polite">
-    <a href="#" id="closeView" class="backBtn" aria-label="Volver al menú">
-      <svg viewBox="0 0 24 24" fill="none" width="16" height="16" aria-hidden="true">
-        <path d="M14 6l-6 6 6 6" stroke="#0c1220" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      Volver
-    </a>
-    <iframe id="view" title="Vista de juego" allow="autoplay; clipboard-write; fullscreen; encrypted-media"></iframe>
-  </div>
-
 <script>
-(function(){
-  const audio = document.getElementById('bgm');
-  const baseVol = 0.16;
-  const CHOICE_KEY = 'mg_path_choice_v1'; // 'slots' | 'live'
+  const bgm=document.getElementById('bgm');
+  // Calentamos en silencio y activamos con la primera interacción
+  window.addEventListener('load', async ()=>{ try{ bgm.volume=0.28; bgm.muted=true; await bgm.play(); }catch(e){} }, {once:true});
+  const unlock = async ()=>{ try{ if(bgm.paused){ await bgm.play(); } bgm.muted=false; }catch(e){} };
+  ['pointerdown','keydown'].forEach(ev=>addEventListener(ev, unlock, {once:true, passive:true}));
 
-  function getChoice(){
-    try{ return localStorage.getItem(CHOICE_KEY) || '' }catch(e){ return '' }
-  }
-  function setChoice(v){
-    try{ localStorage.setItem(CHOICE_KEY, v) }catch(e){}
-  }
-
-  async function bootBgm(){
-    try{ audio.muted = true; audio.volume = baseVol; await audio.play(); }catch(e){}
-    const unlock = async ()=>{ try{ audio.muted=false; audio.volume=baseVol; await audio.play(); }catch(e){} };
-    window.addEventListener('pointerdown', unlock, { once:true, passive:true });
-    window.addEventListener('keydown', unlock, { once:true });
-  }
-  window.addEventListener('load', bootBgm, { once:true });
-
-  const viewWrap = document.getElementById('viewWrap');
-  const view     = document.getElementById('view');
-  const closeBtn = document.getElementById('closeView');
-
-  function openView(url){
-    if(!url) return;
-    view.src = url;
-    viewWrap.classList.add('show');
-    document.documentElement.style.overflow = 'hidden';
-  }
-  function closeView(e){
-    if(e) e.preventDefault();
-    viewWrap.classList.remove('show');
-    document.documentElement.style.overflow = '';
-    view.src = 'about:blank';
-  }
-
-  // Lógica “un solo camino”
-  const btnSlots = document.getElementById('btnSlots');
-  const btnLive  = document.getElementById('btnLive');
-  const choice = getChoice();
-  if(choice==='slots'){ btnLive.classList.add('locked'); }
-  if(choice==='live'){ btnSlots.classList.add('locked'); }
-
-  [btnSlots, btnLive].forEach(a=>{
-    a.addEventListener('click', (e)=>{
-      e.preventDefault();
-      const url = a.getAttribute('data-url');
-      const chosen = (a.id==='btnSlots') ? 'slots' : 'live';
-      const prev = getChoice();
-      if(prev && prev!==chosen){
-        // ya eligió el otro camino → bloqueado
-        return;
-      }
-      if(!prev){ setChoice(chosen); }
-      openView(url);
-      // tras elegir, bloquear el otro botón visualmente
-      if(chosen==='slots'){ btnLive.classList.add('locked'); }
-      else{ btnSlots.classList.add('locked'); }
-    }, {passive:false});
-  });
-
-  closeBtn.addEventListener('click', closeView);
-})();
+  // Asegura que la música se pare al navegar a otra página (no se apila)
+  function stopBgm(){ try{ bgm.pause(); bgm.currentTime=0; }catch(e){} }
+  document.getElementById('toSlot').addEventListener('click',()=> stopBgm(), {passive:true});
+  document.getElementById('toLive').addEventListener('click',()=> stopBgm(), {passive:true});
+  window.addEventListener('pagehide', stopBgm, {once:true});
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') stopBgm(); });
 </script>
 </body>
 </html>
