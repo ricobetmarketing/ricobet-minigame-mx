@@ -1,4 +1,4 @@
-<!doctype html>
+<!doctype html> 
 <html lang="es">
 <head>
 <meta charset="utf-8" />
@@ -310,10 +310,31 @@
   }
   window.addEventListener('load', boot, { once:true });
 
-  /* ===== SPA: abrir/cerrar juegos en iframe ===== */
+  /* ===== SPA ===== */
   const viewWrap = document.getElementById('viewWrap');
   const view     = document.getElementById('view');
   const closeBtn = document.getElementById('closeView');
+
+  /* ===== Lock to first chosen path (menu guard) ===== */
+  const CHOICE_KEY = 'mg_path_choice_v2';
+  function pathForUrl(u){
+    if(!u) return null;
+    if(/slot/i.test(u)) return 'slot';
+    if(/live/i.test(u)) return 'live';
+    return null;
+  }
+  function canEnter(url){
+    const targetPath = pathForUrl(url);
+    if(!targetPath) return true;
+    try{
+      const chosen = localStorage.getItem(CHOICE_KEY);
+      if(chosen && chosen !== targetPath){
+        alert('Ya comenzaste otro camino. Sólo puedes jugar un camino por sesión.');
+        return false;
+      }
+    }catch(_){}
+    return true;
+  }
 
   function openView(url){
     if(!url) return;
@@ -322,31 +343,30 @@
     view.src = url;
     viewWrap.classList.add('show');
     document.documentElement.style.overflow = 'hidden';
-    // Al cargar el iframe, intentar silenciar su BGM si lo necesitases:
+    // Al cargar el iframe, permitir que el juego maneje su propio BGM
     view.addEventListener('load', ()=>{
       try{
         const doc = view.contentDocument || view.contentWindow.document;
         const bgm = doc && doc.getElementById && doc.getElementById('bgm');
-        if(bgm){ bgm.muted = false; } // deja que la música del juego suene (el índice ya está silenciado)
+        if(bgm){ bgm.muted = false; }
       }catch(_){}
     }, { once:true });
   }
 
   function closeView(e){
     if(e) e.preventDefault();
-    // Detener audio/vídeo del juego limpiando el src
     view.src = 'about:blank';
     viewWrap.classList.remove('show');
     document.documentElement.style.overflow = '';
-    // Reanudar música del índice
     (async ()=>{ try{ audio.muted=false; audio.volume=baseVol; await audio.play(); setUI(true); }catch(_){ setUI(false); } })();
   }
 
+  // REEMPLAZA el handler anterior por este:
   document.querySelectorAll('.island').forEach(a=>{
     a.addEventListener('click', (e)=>{
       e.preventDefault();
       const url = a.getAttribute('data-url');
-      openView(url);
+      if(canEnter(url)) openView(url);
     }, {passive:false});
   });
   closeBtn.addEventListener('click', closeView);
