@@ -415,6 +415,14 @@ function makeReel(){
 }
 for(let i=0;i<3;i++){ reelsEl.appendChild(makeReel()); }
 
+/* 🟣 FIX: pre-llenar los símbolos visibles antes del primer giro */
+document.querySelectorAll('.reel .col').forEach(col=>{
+  const visible = Array.from(col.children).slice(8, 11); // aprox. los 3 del medio
+  visible.forEach(it=>{
+    it.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+  });
+});
+
 /* Flujo de giro */
 function spin(){
   if(spinning || state.claimed) return;
