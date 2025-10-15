@@ -1,4 +1,4 @@
-<!doctype html> 
+<!doctype html>  
 <html lang="es">
 <head>
 <meta charset="utf-8" />
@@ -342,6 +342,25 @@ const CODES   =["VIPS05","VIPS25"];
 const STATE_KEY='slot_purple_state_fx1';
 const VOUCHER_KEY='slot_purple_voucher_fx1';
 
+/* 🔒 PATH LOCK: bloquear si ya eligió Live y fijar a 'slot' al iniciar */
+const CHOICE_KEY='mg_path_choice_v2';
+(function blockIfOtherPath(){
+  try{
+    const ch = localStorage.getItem(CHOICE_KEY);
+    if(ch && ch!=='slot'){
+      alert('Ya comenzaste Casino en Vivo. Sólo puedes jugar un camino por sesión.');
+      location.href='index.html';
+    }
+  }catch(e){}
+})();
+function setPathOnce(){
+  try{
+    if(!localStorage.getItem(CHOICE_KEY)){
+      localStorage.setItem(CHOICE_KEY,'slot');
+    }
+  }catch(e){}
+}
+
 let state=loadState();
 let spinning=false, started=false, turbo=false;
 
@@ -426,7 +445,12 @@ document.querySelectorAll('.reel .col').forEach(col=>{
 /* Flujo de giro */
 function spin(){
   if(spinning || state.claimed) return;
-  if(!started){ started=true; if(backBtn) backBtn.style.display='none'; }
+  if(!started){
+    started=true; 
+    if(backBtn) backBtn.style.display='none';
+    // 🔒 fijar la ruta al primer giro
+    setPathOnce();
+  }
   if(state.left<=0){ maybeVoucher(); return; }
 
   spinning=true; payoutEl.textContent=''; lever.classList.add('pull');
